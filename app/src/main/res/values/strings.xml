@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">NYC  Jobs</string>
+    <string name="app_name">Select Job</string>
+    <string name="data_failed">Job Postings not available. Try Later</string>
+    <string name="loaded">loaded</string>
 </resources>
