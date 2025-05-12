@@ -47,12 +47,13 @@ dependencies {
     //Retrofit, network and json serialization
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter)
-
+    implementation("androidx.navigation:navigation-compose:2.7.3")
     implementation(libs.kotlinx.serialization)
 
 
     //Room
     implementation(libs.androidx.room)
+    implementation(libs.androidx.navigation.runtime.android)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 

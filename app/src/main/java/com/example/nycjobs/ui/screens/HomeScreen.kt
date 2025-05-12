@@ -1,3 +1,4 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
@@ -27,7 +28,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.CardDefaults
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -35,6 +35,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.filled.Search
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.nycjobs.ui.screens.JobPostingsViewModel
 
 /**  Home Screen
@@ -49,7 +51,8 @@ import com.example.nycjobs.ui.screens.JobPostingsViewModel
 @Composable
 fun HomeScreen(
     viewModel: JobPostingsViewModel,
-    modifier: Modifier = Modifier
+    navController: NavController,
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
@@ -78,7 +81,8 @@ fun HomeScreen(
                         scrollPosition = viewModel.getScrollPosition(),
                         modifier = modifier
                             .fillMaxSize()
-                            .padding(paddingValues) // Apply padding to JobList
+                            .padding(paddingValues),
+                        navController = navController
                     )
                 }
 
@@ -105,6 +109,7 @@ fun JobPostList(
     loadMoreData: () -> Unit,
     updateScrollPosition: (Int) -> Unit,
     scrollPosition: Int,
+    navController: NavController,
     modifier: Modifier
 ) {
     val firstVisibleIndex = if (scrollPosition > jobPostings.size) 0 else scrollPosition
@@ -115,7 +120,7 @@ fun JobPostList(
         state = listState
     ) {
         items(jobPostings) { jobPost: JobPost ->
-            JobsCard(jobPost = jobPost)
+            JobsCard(jobPost = jobPost, navController = navController )
 
         }
     }
@@ -134,10 +139,14 @@ fun JobPostList(
 
 
 @Composable
-fun JobsCard(jobPost: JobPost, modifier: Modifier = Modifier) {
+fun JobsCard(jobPost: JobPost, modifier: Modifier = Modifier, navController: NavController) {
 
     Card(
-        modifier = Modifier.padding(16.dp),
+        modifier = Modifier
+            .padding(8.dp)
+            .clickable{
+                navController.navigate("detail_screen/${jobPost.jobId}")
+            },
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
@@ -173,93 +182,6 @@ fun JobsCard(jobPost: JobPost, modifier: Modifier = Modifier) {
 
 
 
-@Preview(showBackground = false)
-@Composable
-fun PreviewJobsCard() {
-    val dummyJobPost = JobPost(
-        jobId = 1234,
-        agency = "Department of Technology",
-        numOfOpenPositions = "3",
-        businessTitle = "Software Engineer",
-        civilServiceTitle = "Senior Developer",
-        jobCategory = "IT & Software",
-        fullOrPartTime = 'F',
-        careerLevel = "Mid-Level",
-        salaryRangeFrom = 85000.0,
-        salaryRangeTo = 120000.0,
-        salaryFrequency = "Annual",
-        agencyLocation = "New York",
-        divisionWorkUnit = "Software Division",
-        jobDescription = "Develop and maintain software applications.",
-        minRequirement = "Bachelor's degree in Computer Science.",
-        preferredSkills = "Experience with Kotlin and Jetpack Compose.",
-        additionalInfo = "Flexible work schedule.",
-        toApply = "Submit resume online.",
-        workLocation = "New York Office",
-        postingDate = "2025-04-10",
-        postUntil = "2025-06-10",
-        postingLastUpdated = "2025-05-01"
-    )
 
-    JobsCard(jobPost = dummyJobPost)
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun JobPostListPreview() {
-    val sampleJobs = listOf(
-        JobPost(
-            jobId = 1,
-            agency = "Parks Department",
-            numOfOpenPositions = "5",
-            businessTitle = "Horticulturist",
-            civilServiceTitle = "Gardener",
-            jobCategory = "Environmental",
-            fullOrPartTime = 'F',
-            careerLevel = "Entry-Level",
-            salaryRangeFrom = 45000.0,
-            salaryRangeTo = 60000.0,
-            salaryFrequency = "Annual",
-            agencyLocation = "Central Park",
-            divisionWorkUnit = "Horticulture Division",
-            jobDescription = "Planting and maintaining gardens...",
-            postingDate = "2024-05-03",
-            postingLastUpdated = "2024-05-03"
-        ),
-        JobPost(
-            jobId = 2,
-            agency = "Department of Technology",
-            numOfOpenPositions = "2",
-            businessTitle = "Software Engineer",
-            civilServiceTitle = "Computer Programmer",
-            jobCategory = "Technology",
-            fullOrPartTime = 'F',
-            careerLevel = "Mid-Level",
-            salaryRangeFrom = 80000.0,
-            salaryRangeTo = 110000.0,
-            salaryFrequency = "Annual",
-            agencyLocation = "Downtown Brooklyn",
-            divisionWorkUnit = "Software Development Team",
-            jobDescription = "Developing and maintaining applications...",
-            postingDate = "2024-05-01",
-            postingLastUpdated = "2024-05-01"
-        ),
-        // Add more sample JobPost objects
-    )
-
-    JobPostList(
-        jobPostings = sampleJobs,
-        loadMoreData = {
-            // Dummy implementation for preview
-            println("Load more data triggered in preview")
-        },
-        updateScrollPosition = { position ->
-            // Dummy implementation for preview
-            println("Scroll position updated to $position in preview")
-        },
-        scrollPosition = 0, // Initial scroll position for preview
-        modifier = Modifier.fillMaxSize() // Make the list take up the preview area
-    )
-}
 
 
