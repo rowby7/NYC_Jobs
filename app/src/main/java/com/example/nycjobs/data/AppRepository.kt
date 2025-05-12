@@ -68,6 +68,8 @@ class AppRepositoryImpl(
         return localData
     }
 
+
+
     /** Retrieves a job post from the local database. */
     override suspend fun getJobPost(jobId: Int): JobPost {
         return dao.get(jobId).first()

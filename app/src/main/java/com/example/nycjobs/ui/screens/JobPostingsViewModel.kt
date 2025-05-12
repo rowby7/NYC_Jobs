@@ -66,6 +66,20 @@ class JobPostingsViewModel(private val repository: AppRepository) : ViewModel() 
             }
         }
     }
+    fun getJobPost(jobId: Int, onResult: (JobPost?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val jobPost = repository.getJobPost(jobId) // 🔹 Fetch from AppRepository
+                onResult(jobPost) // 🔹 Send result back
+            } catch (e: IOException) {
+                e.message?.let { Log.e(TAG, it) }
+                onResult(null) // Handle error gracefully
+            } catch (e: HttpException) {
+                e.message?.let { Log.e(TAG, it) }
+                onResult(null)
+            }
+        }
+    }
 
     /**  get scroll position
      *   This function will get the scroll position from the repository.
