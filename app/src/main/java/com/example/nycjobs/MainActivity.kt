@@ -59,7 +59,11 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            jobPost?.let { DetailScreen(it) }
+                            jobPost?.let { DetailScreen(
+                                it,
+                                viewModel = viewModel,
+                                navController = navController
+                            ) }
                         }
                     }
                 }

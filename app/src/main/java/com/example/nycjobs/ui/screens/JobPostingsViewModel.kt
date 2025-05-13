@@ -3,6 +3,7 @@ package com.example.nycjobs.ui.screens
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -45,6 +46,10 @@ class JobPostingsViewModel(private val repository: AppRepository) : ViewModel() 
     var jobPostingsUIState: JobPostingsUIState by mutableStateOf(JobPostingsUIState.Ready)
         private set
 
+    private val  _favorites = mutableStateListOf<Int>()
+    val favorites: List<Int> get() = _favorites
+
+
     init {
         getJobPostings()
     }
@@ -79,6 +84,18 @@ class JobPostingsViewModel(private val repository: AppRepository) : ViewModel() 
                 onResult(null)
             }
         }
+    }
+
+    fun toggleFavorite(jobId: Int){
+        if(_favorites.contains(jobId)){
+            _favorites.remove(jobId)
+        } else {
+            _favorites.add(jobId)
+        }
+    }
+
+    fun isFavorite(jobId: Int): Boolean {
+        return _favorites.contains(jobId)
     }
 
     /**  get scroll position

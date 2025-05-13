@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.example.nycjobs.R
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -31,10 +32,17 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.nycjobs.ui.screens.JobPostingsViewModel
@@ -54,7 +62,10 @@ fun HomeScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
 ) {
+    var showFavorites by remember { mutableStateOf(false) }
+
     Scaffold(
+
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.app_name)) },
@@ -66,12 +77,25 @@ fun HomeScreen(
 
             )
         },
+        bottomBar = {
+            // Add the bottom navigation bar here.
+            BottomNavigationBar(
+                showFavorites = showFavorites,
+                onHomeClick = { showFavorites = false },
+                onFavoritesClick = { showFavorites = true }
+            )
+        },
         content = { paddingValues ->
             when (val uiState = viewModel.jobPostingsUIState) {
                 is JobPostingsUIState.Loading -> LoadingSpinner()
                 is JobPostingsUIState.Success -> {
+                    val jobsToShow = if (showFavorites) {
+                        uiState.data.filter { viewModel.isFavorite(it.jobId) }
+                    } else {
+                        uiState.data
+                    }
                     JobPostList(
-                        jobPostings = uiState.data,
+                        jobPostings = jobsToShow,
                         loadMoreData = { viewModel.getJobPostings() },
                         updateScrollPosition = { scrollPosition ->
                             viewModel.setScrollingPosition(
@@ -93,6 +117,31 @@ fun HomeScreen(
     )
 }
 
+@Composable
+fun BottomNavigationBar(
+    showFavorites: Boolean,
+    onHomeClick: () -> Unit,
+    onFavoritesClick: () -> Unit
+) {
+    NavigationBar {
+        NavigationBarItem(
+            icon = {
+                Icon(Icons.Filled.Home, contentDescription = "Home")
+            },
+            label = { Text("Home") },
+            selected = !showFavorites,
+            onClick = { onHomeClick() }
+        )
+        NavigationBarItem(
+            icon = {
+                Icon(Icons.Filled.Favorite, contentDescription = "Favorites")
+            },
+            label = { Text("Favorites") },
+            selected = showFavorites,
+            onClick = { onFavoritesClick() }
+        )
+    }
+}
 /**  Job Post List
  *   This composable function is the list of job postings.
  *   @param jobPostings the list of job postings
